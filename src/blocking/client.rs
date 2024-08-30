@@ -115,6 +115,28 @@ impl ClientBuilder {
 
     // Higher-level options
 
+    /// Sets the `Authorization` basic-auth header to be used by this client.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # async fn doc() -> Result<(), reqwest::Error> {
+    ///
+    /// let client = reqwest::blocking::Client::builder()
+    ///     .basic_auth("username", Some("password"))
+    ///     .build()?;
+    /// let res = client.get("https://www.rust-lang.org").send()?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn basic_auth<U, P>(mut self, username: U, password: Option<P>) -> ClientBuilder
+    where
+        U: std::fmt::Display,
+        P: std::fmt::Display,
+    {
+        self.with_inner(move |inner| inner.basic_auth(username, password))
+    }
+
     /// Sets the `User-Agent` header to be used by this client.
     ///
     /// # Example

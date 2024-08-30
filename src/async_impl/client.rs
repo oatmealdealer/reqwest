@@ -40,8 +40,9 @@ use crate::Identity;
 use crate::{IntoUrl, Method, Proxy, StatusCode, Url};
 use bytes::Bytes;
 use http::header::{
-    Entry, HeaderMap, HeaderValue, ACCEPT, ACCEPT_ENCODING, CONTENT_ENCODING, CONTENT_LENGTH,
-    CONTENT_TYPE, LOCATION, PROXY_AUTHORIZATION, RANGE, REFERER, TRANSFER_ENCODING, USER_AGENT,
+    Entry, HeaderMap, HeaderValue, ACCEPT, ACCEPT_ENCODING, AUTHORIZATION, CONTENT_ENCODING,
+    CONTENT_LENGTH, CONTENT_TYPE, LOCATION, PROXY_AUTHORIZATION, RANGE, REFERER, TRANSFER_ENCODING,
+    USER_AGENT,
 };
 use http::uri::Scheme;
 use http::Uri;
@@ -823,7 +824,30 @@ impl ClientBuilder {
     }
 
     // Higher-level options
-
+    /// Sets the `Authorization` basic-auth header to be used by this client.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # async fn doc() -> Result<(), reqwest::Error> {
+    ///
+    /// let client = reqwest::Client::builder()
+    ///     .basic_auth("username", Some("password"))
+    ///     .build()?;
+    /// let res = client.get("https://www.rust-lang.org").send().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn basic_auth<U, P>(mut self, username: U, password: Option<P>) -> ClientBuilder
+    where
+        U: std::fmt::Display,
+        P: std::fmt::Display,
+    {
+        self.config
+            .headers
+            .insert(AUTHORIZATION, crate::util::basic_auth(username, password));
+        self
+    }
     /// Sets the `User-Agent` header to be used by this client.
     ///
     /// # Example

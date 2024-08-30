@@ -1,4 +1,4 @@
-use http::header::USER_AGENT;
+use http::header::{USER_AGENT, AUTHORIZATION};
 use http::{HeaderMap, HeaderValue, Method};
 use js_sys::{Promise, JSON};
 use std::convert::TryInto;
@@ -280,6 +280,18 @@ impl ClientBuilder {
         Ok(Client {
             config: Arc::new(config),
         })
+    }
+
+    /// Sets the `Authorization` basic-auth header to be used by this client.
+    pub fn basic_auth<U, P>(mut self, username: U, password: Option<P>) -> ClientBuilder
+    where
+        U: std::fmt::Display,
+        P: std::fmt::Display,
+    {
+        self.config
+            .headers
+            .insert(AUTHORIZATION, crate::util::basic_auth(username, password));
+        self
     }
 
     /// Sets the `User-Agent` header to be used by this client.
